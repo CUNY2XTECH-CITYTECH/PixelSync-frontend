@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= FormType === 'login' ? 'Login' : 'Register' %></title>
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+  <main class="auth-container">
+    <h2><%= FormType === 'login' ? 'PixelSync' : 'Create Account ✨' %></h2>
+
+    <% if (FormType === 'login') { %>
+      <form action="/auth/login" method="POST">
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="password" type="password" placeholder="Password" required>
+        <button type="submit">Sign In</button>
+        <p>Don’t have an account? <a href="/auth/register">Register</a></p>
+      </form>
+    <% } else { %>
+      <form action="/auth/register" method="POST">
+        <input name="name" type="text" placeholder="Full Name" required>
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="password" type="password" placeholder="Password" required>
+        <button type="submit">Sign Up</button>
+        <p>Already have an account? <a href="/auth/login">Login</a></p>
+      </form>
+    <% } %>
+  </main>
+</body>
+</html>
