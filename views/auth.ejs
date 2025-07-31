@@ -7,24 +7,38 @@
 </head>
 <body>
   <main class="auth-container">
-    <h2><%= FormType === 'login' ? 'PixelSync' : 'Create Account ✨' %></h2>
+    <h2><%- FormType === 'login' ? '<span class = "span-title-1">Pixel</span><span class="span-title-2">Sync</span>' : '<span class = "span-title-1">Pixel</span><span class="span-title-2">Sync</span>' %></h2>
 
     <% if (FormType === 'login') { %>
+    <div class = "sign-container">
       <form action="/auth/login" method="POST">
-        <input name="email" type="email" placeholder="Email" required>
-        <input name="password" type="password" placeholder="Password" required>
-        <button type="submit">Sign In</button>
-        <p>Don't have an account? <a href="/auth/register">Register</a></p>
+        <h3>Sign In</h3>
+        <p>Don't have an account? <a href="/auth/register">Sign Up Here.</a></p>
+        <div class = "inputs">
+            <h4 class = "cuny-email-title">CUNY Email</h4>
+            <input class="emailInput" name="email" type="email" placeholder="Enter Your CUNY Email..." required>
+            <h4 class = "cuny-password-title">Password</h4>
+            <input class="passwordInput" name="password" type="password" placeholder="Password" required>
+            <button type="submit">Sign In</button>
+        </div>
       </form>
+
     <% } else { %>
       <form action="/auth/register" method="POST">
-        <input name="name" type="text" placeholder="Full Name" required>
-        <input name="email" type="email" placeholder="Email" required>
-        <input name="password" type="password" placeholder="Password" required>
-        <button type="submit">Sign Up</button>
-        <p>Already have an account? <a href="/auth/login">Login</a></p>
+        <div class = "sign-container-2">
+            <h3>Sign Up</h3>
+            <p>Already have an account? <a href="/auth/login">Login</a></p>
+            <h4 class = "cuny-name-title">Name</h4>
+            <input class = "nameInput" name="name" type="text" placeholder="Full Name" required>
+            <h4 class = "cuny-email-title">CUNY Email</h4>
+            <input class="emailInput" name="email" type="email" placeholder="Email" required>
+            <h4 class = "cuny-password-title-2">Create A Password</h4>
+            <input class="passwordInput" name="password" type="password" placeholder="Password" required>
+            <button type="submit">Sign Up</button>
+        </div> 
       </form>
     <% } %>
+    </div>
   </main>
 </body>
 </html>
