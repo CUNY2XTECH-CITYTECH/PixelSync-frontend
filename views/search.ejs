@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CUNY BOARDS SEARCH</title>
+</head>
+<body>
+  <label for="schools">Search Schools:</label>
+  <select id="schools">
+    <option value="">-- Select School --</option>
+    <option value="Baruch College">Baruch College</option>
+    <option value="BMCC">BMCC</option>
+    <option value="Bronx Community College">Bronx Community College</option>
+    <option value="Brooklyn College">Brooklyn College</option>
+    <option value="City College of New York">City College of New York</option>
+    <option value="College of Staten Island">College of Staten Island</option>
+    <option value="CUNY Graduate Center">CUNY Graduate Center</option>
+    <option value="CUNY Graduate School of Journalism">CUNY Graduate School of Journalism</option>
+    <option value="CUNY Graduate School of Public Health and Health Policy">CUNY Graduate School of Public Health and Health Policy</option>
+    <option value="CUNY Law School">CUNY Law School</option>
+    <option value="Guttman Community College">Guttman Community College</option>
+    <option value="Hostos Community College">Hostos Community College</option>
+    <option value="Hunter College">Hunter College</option>
+    <option value="John Jay College">John Jay College</option>
+    <option value="Kingsborough Community College">Kingsborough Community College</option>
+    <option value="LaGuardia Community College">LaGuardia Community College</option>
+    <option value="Lehman College">Lehman College</option>
+    <option value="Medgar Evers College">Medgar Evers College</option>
+    <option value="New York City College of Technology">New York City College of Technology</option>
+    <option value="Queens College">Queens College</option>
+    <option value="Queensborough Community College">Queensborough Community College</option>
+    <option value="School of Labor and Urban Studies">School of Labor and Urban Studies</option>
+    <option value="School of Professional Studies">School of Professional Studies</option>
+    <option value="Stella and Charles Guttman Community College">Stella and Charles Guttman Community College</option>
+    <option value="York College">York College</option>
+  </select>
+
+  <br><br>
+
+  <label for="classes">Classes:</label>
+  <input type="text" id="classes" list="classOptions" autocomplete="off" />
+  <datalist id="classOptions"></datalist>
+
+  <p id="result"></p>
+
+  <script src="search.js"></script>
+</body>
+</html>
