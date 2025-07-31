@@ -1,0 +1,56 @@
+body{ 
+    text-align: center;
+    align-items: center;
+    font-family: "Libre Franklin", sans-serif;
+}
+
+.span-title-1 {
+    color: #0033A1;
+}
+
+.span-title-2{
+    color: #FFB71B;
+}
+
+.span-title-1, .span-title-2{
+    font-size: 48px;
+}
+
+.sign-container{
+    border: 8px solid #FFB71B;
+    border-radius: 10px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    width: 425px;
+    height: 380px;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+.inputs{ 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    fill: #F0F1FF;
+}
+
+.emailInput, .passwordInput {
+    border: 1.5px solid #0033A1;
+    background-color: #F0F1FF;
+    border-radius: 10px;
+    width: 318px;
+    height: 45px;
+    margin-top: 30px;
+}
+
+h2{
+    margin-top: 35px;
+}
+
+h3{
+    font-size: 20px;
+    color:black;
+}

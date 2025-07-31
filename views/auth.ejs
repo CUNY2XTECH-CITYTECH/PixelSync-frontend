@@ -7,14 +7,18 @@
 </head>
 <body>
   <main class="auth-container">
-    <h2><%= FormType === 'login' ? 'PixelSync' : 'Create Account ✨' %></h2>
+    <h2><%- FormType === 'login' ? '<span class = "span-title-1">Pixel</span><span class="span-title-2">Sync</span>' : 'Create Account ✨' %></h2>
 
     <% if (FormType === 'login') { %>
+    <div class = "sign-container">
       <form action="/auth/login" method="POST">
-        <input name="email" type="email" placeholder="Email" required>
-        <input name="password" type="password" placeholder="Password" required>
-        <button type="submit">Sign In</button>
-        <p>Don't have an account? <a href="/auth/register">Register</a></p>
+        <h3>Sign In</h3>
+        <p>Don't have an account? <a href="/auth/register">Sign Up Here.</a></p>
+        <div class = "inputs">
+            <input class="emailInput" name="email" type="email" placeholder="Email" required>
+            <input class="passwordInput" name="password" type="password" placeholder="Password" required>
+            <button type="submit">Sign In</button>
+        </div>
       </form>
     <% } else { %>
       <form action="/auth/register" method="POST">
@@ -25,6 +29,7 @@
         <p>Already have an account? <a href="/auth/login">Login</a></p>
       </form>
     <% } %>
+    </div>
   </main>
 </body>
 </html>
