@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Whiteboard</title>
+  <link rel="stylesheet" href="/styles/whiteboard.css">
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar" id="sidebar">
+      <button onclick="toggleSidebar()">☰</button>
+      <label>Color:</label>
+      <input type="color" id="colorPicker">
+      <label>Size:</label>
+      <input type="range" id="strokeSize" min="1" max="10">
+      <button onclick="setMode('draw')">Draw</button>
+      <button onclick="setMode('write')">Write</button>
+      <button onclick="clearCanvas()">Clear</button>
+    </div>
+
+    <canvas id="whiteboard"></canvas>
+
+    <button id="saveBtn">Save</button>
+  </div>
+
+  <script src="/scripts/whiteboard.js"></script>
+</body>
+</html>
