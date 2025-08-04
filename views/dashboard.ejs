@@ -12,12 +12,23 @@
 <div id = "create-modal" class = "modal">
   <div class = "modal-content">
     <span class = "close">&times;</span>
-    <h1>Create New Board</h1>
-    <h4>Board Name</h4>
-    <h4>Corresponding Class Code</h4>
-    <h4>Tags</h4>
-    <img class= "doodle-prev" src = "PixelSync-frontend\public\assets\doodle-prev.png">
-    <a href="/whiteboard" class = "modal-link">Create</a>
+    <h1 id = "create-board-title">Create New Board</h1>
+    <div class="modal-layout">
+      <div class="modal-left">
+        <h4 class = "subtitle">Board Name</h4>
+        <input class="input" placeholder="Name This Board..." required>
+
+        <h4 class = "subtitle">Corresponding Class Code</h4>
+        <input class="input" placeholder="What class are you making this for?" required>
+
+        <h4 class = "subtitle">Tags</h4>
+        <input class="input" placeholder="Ex: english, pscyh, calc" required>
+      </div>
+      <div class="modal-right">
+        <img class="doodle-prev" src = "../assets/doodle-prev.png">
+        <button class = "modal-button"><a href="/whiteboard">CREATE</a></button>
+      </div>
+    </div>
   </div>
 </div>
 
