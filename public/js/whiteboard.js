@@ -24,13 +24,15 @@ function setMode(newMode) {
 
 canvas.addEventListener("mousedown", (e) => {
   drawing = true;
+  const rect = canvas.getBoundingClientRect();
   ctx.beginPath();
-  ctx.moveTo(e.clientX, e.clientY);
+  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
 });
 
 canvas.addEventListener("mousemove", (e) => {
   if (!drawing) return;
-  ctx.lineTo(e.clientX, e.clientY);
+  const rect = canvas.getBoundingClientRect();
+  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
   ctx.strokeStyle = currentColor;
   ctx.lineWidth = currentSize;
   ctx.lineCap = "round";
