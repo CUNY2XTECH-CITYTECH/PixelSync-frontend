@@ -1,0 +1,25 @@
+.logo {
+    height: 40px; /* Adjust size */
+  }
+  
+  .tile-icon {
+    width: 30px;
+    display: block;
+    margin: 0 auto 10px;
+  }
+  .board-tile {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 10px rgba(0, 57, 166, 0.1);
+    transition: all 0.3s;
+    text-align: center;
+  }
+  .board-tile:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 57, 166, 0.2);
+  }
+  .tile-icon {
+    width: 40px;
+    margin-bottom: 10px;
+  }

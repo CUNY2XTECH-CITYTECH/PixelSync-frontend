@@ -1,3 +1,30 @@
+:root {
+  --cuny-blue: #0039A6;
+  --cuny-light-blue: #B3D1FF;
+  --cuny-gold: #FFD700; /* Accent */
+  --cuny-white: #FFFFFF;
+  --cuny-gray: #F5F5F5;
+}
+
+/* Update existing CSS */
+header, .sidebar {
+  background: var(--cuny-blue);
+}
+
+.board-tile {
+  background: var(--cuny-white);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 57, 166, 0.1);
+  transition: transform 0.2s;
+}
+
+.board-tile:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 57, 166, 0.15);
+}
+
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f2f2f2;
@@ -52,4 +79,16 @@ body {
     padding: 20px;
     margin-top: 30px;
   }
-  
+  .sidebar-section {
+    margin-bottom: 25px;
+  }
+  .dropdown-btn, .dropdown {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+  }
+  .stars {
+    color: #FFD700; /* Gold */
+    font-size: 1.2em;
+  }
