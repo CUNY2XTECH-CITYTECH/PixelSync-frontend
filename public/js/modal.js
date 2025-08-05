@@ -4,18 +4,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('create-modal');
   const btn = document.getElementById('create');
   const span = document.querySelector('.close');
-  const tagsInput = document.getElementById('tags-input');
   
   console.log('Modal:', modal);
   console.log('Button:', btn);
   console.log('Close span:', span);
-  console.log('Tags input:', tagsInput);
-  
-  // Example: Change placeholder text dynamically
-  if (tagsInput) {
-    // Uncomment and modify the line below to change the placeholder:
-    // tagsInput.placeholder = "Enter tags like: math, science, history";
-  }
   
   if (!btn) {
     console.error('Button with id "create" not found!');
