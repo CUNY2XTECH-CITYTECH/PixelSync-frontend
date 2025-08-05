@@ -128,11 +128,8 @@ body {
   }
 
   .modal-button{
-    display: flex;
-    /* width: 164px;
-    height: 45px; */
     background-color: #0039A6;
-    color:#f2f2f2;
+    color: #f2f2f2;
     font-size: 25px;
     font-weight: 700;
     border: none;
@@ -140,11 +137,12 @@ body {
     border-radius: 10px;
     text-decoration: none;
     margin-right: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
 
-  .modal-button a{
-    text-decoration: none;
-    color: #f2f2f2;
+  .modal-button:hover {
+    background-color: #002d7a;
   }
 
 .input{

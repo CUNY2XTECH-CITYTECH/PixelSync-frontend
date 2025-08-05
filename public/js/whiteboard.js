@@ -7,6 +7,10 @@ let mode = "draw"; // or "write"
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+// Get board name from URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+const boardName = urlParams.get('name') || 'whiteboard'; // fallback to 'whiteboard'
+
 let currentColor = "#000000";
 let currentSize = 2;
 
@@ -46,11 +50,26 @@ canvas.addEventListener("mouseup", () => {
 
 document.getElementById("saveBtn").addEventListener("click", () => {
   const link = document.createElement("a");
-  link.download = "whiteboard.png";
+  
+  // Clean the board name to remove invalid characters for filename
+  const cleanBoardName = boardName.replace(/[<>:"/\\|?*]/g, '-');
+  
+  link.download = `${cleanBoardName}.png`;
   link.href = canvas.toDataURL();
   link.click();
+  
+  console.log(`Saved whiteboard as: ${cleanBoardName}.png`);
 });
 
 function clearCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar.style.display === 'none') {
+    sidebar.style.display = 'flex';
+  } else {
+    sidebar.style.display = 'none';
+  }
 }
