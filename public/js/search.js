@@ -1,29 +1,29 @@
 const Schoolclasses = {
-  "Baruch College": ["ENG 2100", "ENG 2150", "ENG 2150T", "MTH 2001", "MTH 2610"],
-  "BMCC": ["ENG 101", "ENG 102", "MAT 206", "MAT 301"],
-  "Bronx Community College": ["ENG 111", "ENG 114", "BCC MAT", "BCC MAT 201"],
-  "Brooklyn College": ["ENGL 1010", "ENG 1020", "MAT 1011", "MAT 1201"],
-  "City College of New York": ["ENGL 11000", "ENG 11200", "ENGL 33000", "MAT 19500", "MAT 20100"],
-  "College of Staten Island": ["ENG 111", "MTH 130", "MTH 230"],
-  "CUNY Graduate Center": [],
+  "Baruch College": ["CIS 2300", "CIS 3110", "CIS 3400", "CIS 3500", "CIS 3630", "CIS 4650", "CIS 4800", "CIS 7000", "CIS 7050", "ELEC 1111", "BUS 7500"],
+  "BMCC": ["CIS 1", "CSC 101", "CSC 110", "CSC 111", "ELEC 1000", "GEN 1"],
+  "Bronx Community College": ["BIS 99", "CSI 31", "CSI 99", "DAT 30", "DAT 46", "DAT 99", "ELC 18", "ELC 99"],
+  "Brooklyn College": ["CISC. 1000", "CISC. 1035", "CISC. 1050", "CISC. 1110", "CISC. 1115", "CISC. 3320", "CISC. 3343", "CISC. 3650", "CISC. 3660", "CISC. 3800", "CISC. 3810", "CISC. 9999R"],
+  "City College of New York": ["CSC 99902", "ELEC 1000", "ENGR 99902", "HUM 99902"],
+  "College of Staten Island": ["BUS 150", "CSC 102", "CSC 126", "CSC 199", "CSC 199R", "CSC 225", "CSC 299", "CSC 299R", "ELEC 1000"],
+  "CUNY Graduate Center": ["CBA 1000", "CBA 1000N"],
   "CUNY Graduate School of Journalism": [],
   "CUNY Graduate School of Public Health and Health Policy": [],
   "CUNY Law School": [],
-  "Guttman Community College": ["ENGL 103", "MATH 201", "MATH 210"],
-  "Hostos Community College": ["ENG 100", "MAT 160"],
-  "Hunter College": ["ENGL 12000", "ENG 22000", "MAT 12500", "MAT 12550"],
-  "John Jay College": ["ENG 101", "ENG 1010", "MAT 141", "MAT 151"],
-  "Kingsborough Community College": ["ENG 2200", "ENG 2400", "MAT 1400"],
-  "LaGuardia Community College": ["ENG 101", "MATH 200", "MAT 201"],
-  "Lehman College": ["ENG 113", "ENG 121", "MAT 172", "MAT 175"],
-  "Medgar Evers College": ["ENGL 112", "ENGL 150", "MTH 151", "MTH 202"],
-  "New York City College of Technology": ["ENG 1101", "ENG 1101CO", "ENG 1101ML", "ENG 1121", "MAT 1375", "MAT 1475"],
-  "Queens College": ["ENGL 110", "ENGL 110H", "ENGL 130", "ENGL 130H", "MATH 122", "MATH 141"],
-  "Queensborough Community College": ["ENGL 101", "ENGL 102", "MA-440", "MA-128"],
-  "School of Labor and Urban Studies": ["ENG 2100", "ENG 2150", "MTH 2001", "MTH 2610"],
-  "School of Professional Studies": ["ENG 101", "ENG 102", "MATH 102", "MATH 999"],
-  "Stella and Charles Guttman Community College": ["ENGL 103", "ENGL 203", "MATH 120", "MATH 201"],
-  "York College": ["ENG 125", "ENG 126", "MATH 121", "MATH 141"]
+  "Guttman Community College": ["ELEC 1000", "ELEC 1000R", "INFT 211", "INFT 217", "INFT 221", "INFT 223"],
+  "Hostos Community College": ["CSC 1111", "CST 1111", "ELEC 1000"],
+  "Hunter College": ["ELECT 111NL", "FCSW 1000", "MEDP 28500", "CSCI 12000", "CSCI 23200"],
+  "John Jay College": ["CSCI 1", "CSCI 171", "CSCI 271", "CSCI 362", "CSCI 375", "ELEC 1000"],
+  "Kingsborough Community College": ["CP 2100", "CP 500", "CP 6100", "CIS 1200", "CIS 2100", "CIS 2200", "CIS 3100", "CIS 6100", "ELEC 1000"],
+  "LaGuardia Community College": ["BTC 100", "ELEC 1000", "MAC 109", "MAC 125", "MAC 199", "MAC 233", "MAC 250"],
+  "Lehman College": ["CIS 2000", "CIS 242", "CIS 244", "CIS 252", "CIS 331", "CIS 346", "CMP 128", "CMP 167", "MAT 128"],
+  "Medgar Evers College": ["CS 100", "CS 151", "CS 315", "CS 381", "CS 999", "CIS 1000", "CIS 999"],
+  "New York City College of Technology": ["CST 1100", "CST 1101", "CST 1201", "CST 1204", "CST 1215", "CST 2301", "CST 2307", "CST 2309", "CST 2312", "CST 2400", "CST 2402", "CST 2403", "CST 2405", "CST 2406", "CST 2409"],
+  "Queens College": ["CSCI 85", "CSCI 90", "CSCI 111", "CSCI 112", "CSCI 499"],
+  "Queensborough Community College": ["CS 100", "CS 101", "CIS 152", "CIS 153", "CIS 201", "CIS 204", "CIS 208", "CIS 251", "ELEC 1000", "ET 575", "ET 710"],
+  "School of Labor and Urban Studies": ["ELEC 1000", "IS 205", "IS 310", "IS 361", "IS 374"],
+  "School of Professional Studies": ["CS 493", "CS 497", "CS 498", "CS 999", "FCSW 1000", "IS 205", "IS 210", "IS 260", "IS 310", "IS 320", "IS 361", "IS 999", "CIS 999"],
+  "Stella and Charles Guttman Community College": ["ELEC 1000", "ELEC 1000R", "INFT 211", "INFT 217", "INFT 221", "INFT 223"],
+  "York College": ["CS 100", "CS 172", "CS 292", "CS 381", "CS 493", "CS 495", "CS 497", "CS 498", "CS 999"]
 };
 
 const schoolSelect = document.getElementById("schools");
@@ -73,5 +73,3 @@ function updateDatalist(filter) {
     classDatalist.appendChild(option);
   });
 }
-
-// comment 

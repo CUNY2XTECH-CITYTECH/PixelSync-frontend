@@ -1,0 +1,41 @@
+<div class="board-grid">
+  <div class="board-tile">ENG 1111</div>
+  <div class="board-tile">COMP 1111</div>
+  <div class="board-tile">IT 1111</div>
+  <div class="board-tile">MAT 1111</div>
+  <div class="board-tile">PYHS 1111</div>
+  <div class="board-tile">BIO 1111</div>
+</div>
+
+<button id = "create">+</button>
+
+<div id = "create-modal" class = "modal">
+  <div class = "modal-content">
+    <span class = "close">&times;</span>
+    <h1 id = "create-board-title">Create New Board</h1>
+    <form action="/dashboard/create-board" method="POST">
+      <div class="modal-layout">
+        <div class="modal-left">
+          <h4 class = "subtitle">Board Name</h4>
+          <input name="boardName" class="input" placeholder="Name This Board..." required>
+
+          <h4 class = "subtitle">Corresponding Class Code</h4>
+          <input name="classCode" class="input" placeholder="What class are you making this for?" required>
+
+          <h4 class = "subtitle">Tags</h4>
+          <input name="tags" class="input" placeholder="Ex: english, art history, calc" required>
+        </div>
+        <div class="modal-right">
+          <img class="doodle-prev" src = "../assets/doodle-prev.png">
+          <button type="submit" class = "modal-button">CREATE</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="instructions">
+  <h3>Instructions:</h3>
+  <p>Use the search bar to find your personal board based on classes you're taking.</p>
+  <p>Sort them using the rating notes system for better comparisons.</p>
+</div>
