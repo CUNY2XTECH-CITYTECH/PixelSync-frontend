@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
+  <canvas id = "auth-background-canvas"></canvas>
   <main class="auth-container">
     <h2><%- FormType === 'login' ? '<span class = "span-title-1">Pixel</span><span class="span-title-2">Sync</span>' : '<span class = "span-title-1">Pixel</span><span class="span-title-2">Sync</span>' %></h2>
 
@@ -40,5 +41,7 @@
     <% } %>
     </div>
   </main>
+  
+  <script src="/js/auth-canvas.js"></script>
 </body>
 </html>
