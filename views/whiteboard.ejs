@@ -1,27 +1,47 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Whiteboard</title>
-  <link rel="stylesheet" href="/styles/whiteboard.css">
-</head>
-<body>
-  <div class="container">
-    <div class="sidebar" id="sidebar">
-      <button onclick="toggleSidebar()">☰</button>
-      <label>Color:</label>
-      <input type="color" id="colorPicker">
-      <label>Size:</label>
-      <input type="range" id="strokeSize" min="1" max="10">
-      <button onclick="setMode('draw')">Draw</button>
-      <button onclick="setMode('write')">Write</button>
-      <button onclick="clearCanvas()">Clear</button>
+  <head>
+    <title>Whiteboard</title>
+    <link rel="stylesheet" href="/css/whiteboard.css" />
+  </head>
+  <body>
+    <!-- Sidebar wrapper to allow toggle from outside -->
+    <div id="sidebarWrapper">
+      <div class="sidebar" id="sidebar">
+        <div id="drawTools">
+          <label for="drawColorPicker">Draw Color:</label>
+          <input type="color" id="drawColorPicker" value="#000000" />
+          <label for="drawStrokeSize">Brush Size:</label>
+          <input type="range" id="drawStrokeSize" min="1" max="10" value="2" />
+        </div>
+
+        <!-- Write Tools -->
+        <div id="writeTools" style="display:none">
+          <label for="textColorPicker">Text Color:</label>
+          <input type="color" id="textColorPicker" value="#000000" />
+          <label for="fontSizeInput">Font Size:</label>
+          <input type="number" id="fontSizeInput" min="10" max="100" value="50" />
+          <label for="fontPicker">Font:</label>
+          <select id="fontPicker">
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Courier New">Courier New</option>
+          </select>
+        </div>
+
+        <!-- Buttons -->
+        <button onclick="setMode('draw')">Draw</button>
+        <button onclick="setMode('write')">Write</button>
+        <button onclick="clearCanvas()">Clear</button>
+        <button id="saveBtn">Save</button>
+        <button onclick="window.location.href='/dashboard'">
+          Back to Dashboard
+        </button>
+      </div>
     </div>
 
-    <canvas id="whiteboard"></canvas>
+    <canvas id="whiteboard" tabindex="0"></canvas>
 
-    <button id="saveBtn">Save</button>
-  </div>
-
-  <script src="/scripts/whiteboard.js"></script>
-</body>
+    <script src="/js/whiteboard.js"></script>
+  </body>
 </html>
