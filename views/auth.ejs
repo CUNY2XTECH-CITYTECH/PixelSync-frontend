@@ -5,7 +5,7 @@
   <title><%= FormType === 'login' ? 'Login' : 'Register' %></title>
   <link rel="stylesheet" href="/css/auth.css">
 </head>
-<body>
+<body> 
   <main class="auth-container">
     <h2><%- FormType === 'login' ? '<span class = "span-title-1">Pixel</span><span class="span-title-2">Sync</span>' : '<span class = "span-title-1">Pixel</span><span class="span-title-2">Sync</span>' %></h2>
 
@@ -40,5 +40,17 @@
     <% } %>
     </div>
   </main>
+  <script type = "module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js'
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'; 
+
+    window.Firebase = {
+      initializeApp,
+      getAuth,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword
+    };
+  </script>
+  <script type="module" src="/js/auth.js"></script>
 </body>
 </html>
