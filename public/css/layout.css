@@ -166,3 +166,10 @@ body {
 .subtitle{
   margin-bottom: 5px;
 }
+
+.log-out {
+  background-color: #FFB71B;
+  color: #0033A1;
+  border: none;
+  border-radius: 10px;
+}
