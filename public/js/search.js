@@ -28,7 +28,7 @@ const Schoolclasses = {
 
 const schoolSelect = document.getElementById("schools");
 const classInput = document.getElementById("classes");
-const classDatalist = document.getElementById("classOptions");
+const matchlist = document.getElementById("matchlist");
 const result = document.getElementById("result");
 
 let selectedSchool = "";
@@ -37,12 +37,12 @@ schoolSelect.addEventListener("change", () => {
   selectedSchool = schoolSelect.value;
   result.textContent = "";
   classInput.value = "";
-  updateDatalist("");
+  updateMatchList("");
 });
 
 classInput.addEventListener("input", () => {
   const inputValue = classInput.value.trim().toUpperCase();
-  updateDatalist(inputValue);
+  updateMatchList(inputValue);
 
   if (!selectedSchool || !inputValue) {
     result.textContent = "";
@@ -58,9 +58,10 @@ classInput.addEventListener("input", () => {
   result.style.color = exactMatch ? "green" : "red";
 });
 
-function updateDatalist(filter) {
-  classDatalist.innerHTML = "";
-  if (!selectedSchool) return;
+function updateMatchList(filter) {
+  matchlist.innerHTML = "";
+
+  if (!selectedSchool || !filter) return;
 
   const classes = Schoolclasses[selectedSchool] || [];
   const filtered = classes.filter(cls =>
@@ -68,8 +69,23 @@ function updateDatalist(filter) {
   );
 
   filtered.forEach(cls => {
-    const option = document.createElement("option");
-    option.value = cls;
-    classDatalist.appendChild(option);
+    const li = document.createElement("li");
+    li.textContent = cls;
+    li.style.cursor = "pointer";
+    li.addEventListener("click", () => {
+      classInput.value = cls;
+      matchlist.innerHTML = "";
+      result.textContent = `Class "${cls}" was found at ${selectedSchool}.`;
+      result.style.color = "green";
+    });
+    matchlist.appendChild(li);
   });
+
+  if (filtered.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "No matches found";
+    li.style.fontStyle = "italic";
+    li.style.color = "#999";
+    matchlist.appendChild(li);
+  }
 }
