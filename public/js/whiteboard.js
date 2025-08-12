@@ -20,6 +20,73 @@ window.addEventListener("load", () => {
   const writeToolsEl = document.getElementById("writeTools");
   const saveBtn = document.getElementById("saveBtn");
 
+  const fontSizeInput = document.getElementById("fontSizeInput");
+
+  fontSizeInput.addEventListener("keydown", (e) => {
+    const allowedKeys = [
+      "Backspace",
+      "Delete",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowDown",
+      "Tab",
+      "Home",
+      "End",
+      "Enter",
+    ];
+
+    // Allow control/navigation keys and digits only
+    if (!allowedKeys.includes(e.key) && (e.key < "0" || e.key > "9")) {
+      e.preventDefault();
+    }
+  });
+
+  fontSizeInput.addEventListener("input", (e) => {
+    const val = e.target.value.trim();
+
+    // Allow empty string so user can delete freely
+    if (val === "") {
+      // don't update font size yet
+      return;
+    }
+
+    const num = Number(val);
+
+    // Update only if valid number within range
+    if (!isNaN(num) && num >= 10 && num <= 100) {
+      textSize = num;
+
+      let cur = writingLines[writingLines.length - 1];
+      if (cur && cur.text === "") cur.size = textSize;
+
+      redrawWritingCanvas();
+    }
+  });
+
+  fontSizeInput.addEventListener("input", (e) => {
+    const val = e.target.value.trim();
+
+    // Allow empty string so user can delete freely
+    if (val === "") {
+      // Optionally: do not update textSize or redraw yet
+      return;
+    }
+
+    const num = Number(val);
+
+    // Only update if valid number and within limits
+    if (!isNaN(num) && num >= 10 && num <= 100) {
+      textSize = num;
+
+      // Update current line style if empty text
+      let cur = writingLines[writingLines.length - 1];
+      if (cur && cur.text === "") cur.size = textSize;
+
+      redrawWritingCanvas();
+    }
+  });
+
   // ---------- State ----------
   let mode = "draw";
   let drawing = false;
@@ -114,34 +181,34 @@ window.addEventListener("load", () => {
     textColorEl.value = textColor;
     textColorEl.addEventListener("input", (e) => {
       textColor = e.target.value;
-      // If current line is empty, update its style so typing uses new color
       let cur = writingLines[writingLines.length - 1];
+      // Only update style if current line is empty (no typed text yet)
       if (cur && cur.text === "") cur.color = textColor;
-      console.log("textColor ->", textColor);
-      // redraw to show caret color if desired
       redrawWritingCanvas();
     });
   }
+
   if (fontSizeEl) {
     fontSizeEl.value = textSize;
     fontSizeEl.addEventListener("input", (e) => {
       textSize = parseInt(e.target.value, 10) || textSize;
       let cur = writingLines[writingLines.length - 1];
       if (cur && cur.text === "") cur.size = textSize;
-      console.log("textSize ->", textSize);
       redrawWritingCanvas();
     });
   }
+
   if (fontPickerEl) {
     fontPickerEl.value = textFont;
     fontPickerEl.addEventListener("change", (e) => {
       textFont = e.target.value;
       let cur = writingLines[writingLines.length - 1];
       if (cur && cur.text === "") cur.font = textFont;
-      console.log("textFont ->", textFont);
       redrawWritingCanvas();
     });
   }
+
+
 
   // ---------- Mode handling ----------
   function setMode(newMode) {
@@ -264,12 +331,52 @@ window.addEventListener("load", () => {
     redrawWritingCanvas();
   }
 
-  // Key handling: type into writingLines (objects)
   window.addEventListener("keydown", (e) => {
     if (mode !== "write") return;
 
-    // prevent accidental scrolling on space/arrow keys? optional
-    if (["ArrowUp", "ArrowDown", "PageUp", "PageDown"].includes(e.key)) return;
+    const active = document.activeElement;
+    if (
+      active &&
+      (active.tagName === "INPUT" || active.tagName === "TEXTAREA")
+    ) {
+      return;
+    }
+
+    // CTRL or CMD + A => select all text
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
+      e.preventDefault();
+      // Select all text by marking a flag
+      window.allTextSelected = true;
+      redrawWritingCanvas();
+      return;
+    }
+
+    // If all text selected and backspace or delete pressed, clear all text
+    if (
+      window.allTextSelected &&
+      (e.key === "Backspace" || e.key === "Delete")
+    ) {
+      e.preventDefault();
+      writingLines = [
+        {
+          text: "",
+          color: textColor,
+          size: textSize,
+          font: textFont,
+        },
+      ];
+      window.allTextSelected = false;
+      redrawWritingCanvas();
+      return;
+    }
+
+    // If any other key pressed, clear the selection flag
+    if (window.allTextSelected) {
+      window.allTextSelected = false;
+    }
+
+    // ... your existing text input handling below
+    // (Backspace, Enter, normal chars etc.)
 
     const cur = writingLines[writingLines.length - 1];
 
@@ -281,7 +388,6 @@ window.addEventListener("load", () => {
       }
       redrawWritingCanvas();
     } else if (e.key === "Enter") {
-      // push new empty line with current style
       writingLines.push({
         text: "",
         color: textColor,
@@ -290,28 +396,37 @@ window.addEventListener("load", () => {
       });
       redrawWritingCanvas();
     } else if (e.key.length === 1) {
-      // printable char
       writingLines[writingLines.length - 1].text += e.key;
       redrawWritingCanvas();
     }
   });
 
+
   function redrawWritingCanvas() {
-    // clear only writing canvas
     writingCtx.clearRect(0, 0, writingCanvas.width, writingCanvas.height);
 
-    // start drawing lines from top padding
     let y = writingPadding;
+
     for (let line of writingLines) {
       writingCtx.font = `${line.size}px ${line.font}`;
+
+      if (window.allTextSelected) {
+        // measure line width
+        const w = writingCtx.measureText(line.text).width;
+
+        // draw highlight rectangle behind text
+        writingCtx.fillStyle = "rgba(0, 120, 215, 0.3)"; // blue highlight color
+        writingCtx.fillRect(writingPadding - 2, y + 2, w + 4, line.size + 4);
+      }
+
       writingCtx.fillStyle = line.color;
-      // baseline manual: we draw text at y + line.size so it looks like top padding
       writingCtx.fillText(line.text, writingPadding, y + line.size);
+
       y += Math.round(line.size * 1.2);
     }
 
-    // caret
-    if (mode === "write" && caretVisible) {
+    // Draw caret only if not selecting all
+    if (mode === "write" && caretVisible && !window.allTextSelected) {
       const last = writingLines[writingLines.length - 1];
       writingCtx.font = `${last.size}px ${last.font}`;
       const caretX = writingPadding + writingCtx.measureText(last.text).width;
@@ -326,6 +441,7 @@ window.addEventListener("load", () => {
       writingCtx.stroke();
     }
   }
+
 
   // Start caret when entering write mode, stop when leaving
   const originalSetMode = window.setMode;
