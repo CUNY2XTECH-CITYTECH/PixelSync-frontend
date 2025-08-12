@@ -1,12 +1,6 @@
 <aside class="sidebar">
-    <!-- <button>Search Schools ⮟</button>
-    <select>
-      <option>Classes ⮟</option>
-      <option>ENG 1111</option>
-      <option>MAT 1111</option>
-    </select> -->
   <label for="schools">Search Schools:</label>
-  <select id="schools">
+  <select id="schools" style="width: 200px;">
     <option value="">-- Select School --</option>
     <option value="Baruch College">Baruch College</option>
     <option value="BMCC">BMCC</option>
@@ -43,11 +37,42 @@
 
   <p id="result"></p>
 
-  <script src="../../public/js/search.js"></script>
+  <script src="/js/search.js"></script>
 
+    <style>
+      .stars {
+        cursor: pointer;
+        font-size: 1.5em;
+        color: #ccc;
+      }
 
+      .stars.selected {
+        color: gold
+      }
+    </style>
     <h2>Rating Notes:</h2>
-    <p>⭐⭐⭐⭐⭐</p>
+    <div id="rating">
+      <span class="stars" data-value="1">★</span>
+      <span class="stars" data-value="2">★</span>
+      <span class="stars" data-value="3">★</span>
+      <span class="stars" data-value="4">★</span>
+      <span class="stars" data-value="5">★</span>
+    </div>
+    <p id="rating-value">Rating: 0</p>
+
+    <script>
+      const stars = document.querySelectorAll('#rating .stars');
+      const ratingValue = document.getElementById('rating-value');
+  stars.forEach(star => {
+    star.addEventListener('click', () => {
+      const val = parseInt(star.getAttribute('data-value'));
+      stars.forEach((s, i) => {
+        s.classList.toggle('selected', i < val);
+      });
+      ratingValue.textContent = `You rated: ${val} star${val > 1 ? 's' : ''}`;
+    });
+  });
+    </script>
   
     <h2>About Us:</h2>
     <p>Student-powered CUNY course boards for easy access and reviews.</p>
