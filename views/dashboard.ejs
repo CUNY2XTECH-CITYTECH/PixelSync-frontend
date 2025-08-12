@@ -1,10 +1,16 @@
 <div class="board-grid">
-  <div class="board-tile">ENG 1111</div>
-  <div class="board-tile">COMP 1111</div>
-  <div class="board-tile">IT 1111</div>
-  <div class="board-tile">MAT 1111</div>
-  <div class="board-tile">PYHS 1111</div>
-  <div class="board-tile">BIO 1111</div>
+  <% if (boards && boards.length) { %>
+    <% boards.forEach(function(board) { %>
+      <div class="board-tile">
+        <div><%= board.boardName %></div>
+        <% if (board.image) { %>
+          <img src="<%= board.image %>" alt="Board Image" style="width:100%;max-width:200px;" />
+        <% } %>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <div>No boards yet. Create one!</div>
+  <% } %>
 </div>
 
 <button id = "create">+</button>
