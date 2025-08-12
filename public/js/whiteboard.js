@@ -85,11 +85,26 @@ canvas.addEventListener("mouseup", () => {
   }
 });
 
-document.getElementById("saveBtn").addEventListener("click", () => {
-  const link = document.createElement("a");
-  link.download = "whiteboard.png";
-  link.href = canvas.toDataURL();
-  link.click();
+document.getElementById("saveBtn").addEventListener("click", async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  let boardName = urlParams.get("name") || "whiteboard";
+  boardName = boardName.replace(/[^a-zA-Z0-9-_ ]/g, "_");
+  const imageData = canvas.toDataURL();
+
+  // Send to backend to save in Firestore
+  await fetch("/dashboard/save-board", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: boardName,
+      image: imageData,
+    }),
+  });
+
+  // Redirect to dashboard after saving
+  window.location.href = "/dashboard";
 });
 
 function clearCanvas() {
