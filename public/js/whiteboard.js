@@ -104,7 +104,9 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
   });
 
   // Redirect to dashboard after saving
-  window.location.href = "/dashboard";
+  const classCode = urlParams.get("class") || "";
+  const tags = urlParams.get("tags") || "";
+  window.location.href = `/whiteboard?name=${encodeURIComponent(boardName)}&class=${encodeURIComponent(classCode)}&tags=${encodeURIComponent(tags)}`;
 });
 
 function clearCanvas() {
@@ -165,3 +167,20 @@ function redrawText() {
   writingPosition.y = y - lineHeight;
 }
 
+window.addEventListener("DOMContentLoaded", async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  let boardName = urlParams.get("name") || "whiteboard";
+  boardName = boardName.replace(/[^a-zA-Z0-9-_ ]/g, "_");
+
+  // Fetch the saved image from backend
+  const response = await fetch(`/dashboard/get-board-image?name=${encodeURIComponent(boardName)}`);
+  const data = await response.json();
+  if (data.image) {
+    const img = new window.Image();
+    img.onload = function () {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = data.image;
+  }
+});
