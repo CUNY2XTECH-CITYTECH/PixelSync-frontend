@@ -3,3 +3,4 @@ router.get('/', async (req, res) => {
   const boards = await getBoardsForUser(userId);
   res.render('dashboard', { boards });
 });
+
