@@ -252,32 +252,6 @@ window.addEventListener("load", () => {
   window.location.href = `/whiteboard?name=${encodeURIComponent(boardName)}&class=${encodeURIComponent(classCode)}&tags=${encodeURIComponent(tags)}`;
 });
 
-function clearCanvas() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  writtenLines = [];
-  writingPosition = { x: 50, y: 50 };
-}
-
-document.addEventListener("keydown", (e) => {
-  if (mode !== "write") return;
-
-  ctx.font = `${textSize}px ${textFont}`;
-  ctx.fillStyle = textColor;
-
-  if (e.key === "Enter") {
-    writingPosition.y += lineHeight;
-    writingPosition.x = 50; // Reset x to left margin after line break
-  } else if (e.key === "Backspace") {
-    // Basic backspace: remove last character and redraw
-    if (writtenLines.length > 0) {
-      let lastLine = writtenLines[writtenLines.length - 1];
-      lastLine = lastLine.slice(0, -1);
-      writtenLines[writtenLines.length - 1] = lastLine;
-
-      if (lastLine.length === 0) {
-        writtenLines.pop();
-        writingPosition.y -= lineHeight;
-      }
   drawingCanvas.addEventListener("mousemove", (e) => {
     if (!isDrawing || mode !== "draw") return;
     const rect = drawingCanvas.getBoundingClientRect();
@@ -541,4 +515,3 @@ window.addEventListener("DOMContentLoaded", async () => {
     fontSizeEl: !!fontSizeEl,
     fontPickerEl: !!fontPickerEl,
   });
-}); // end load listener
