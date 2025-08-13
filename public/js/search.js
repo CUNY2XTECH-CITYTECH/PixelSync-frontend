@@ -77,6 +77,7 @@ function updateMatchList(filter) {
       matchlist.innerHTML = "";
       result.textContent = `Class "${cls}" was found at ${selectedSchool}.`;
       result.style.color = "green";
+      highlightBoardTile(cls); // <-- Connects sidebar to dashboard
     });
     matchlist.appendChild(li);
   });
@@ -87,5 +88,22 @@ function updateMatchList(filter) {
     li.style.fontStyle = "italic";
     li.style.color = "#999";
     matchlist.appendChild(li);
+  }
+}
+
+function highlightBoardTile(className) {
+  // Remove highlight from all tiles
+  document.querySelectorAll('.board-tile').forEach(tile => {
+    tile.style.background = '';
+    tile.style.border = '';
+  });
+
+  // Highlight the matching tile
+  const tile = Array.from(document.querySelectorAll('.board-tile'))
+    .find(t => t.getAttribute('data-class') === className);
+  if (tile) {
+    tile.style.background = '#ffe066';
+    tile.style.border = '2px solid #ffae00';
+    tile.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
