@@ -61,12 +61,12 @@ classInput.addEventListener("input", () => {
 function updateMatchList(filter) {
   matchlist.innerHTML = "";
 
-  if (!selectedSchool || !filter) return;
+  if (!selectedSchool) return;
 
   const classes = Schoolclasses[selectedSchool] || [];
-  const filtered = classes.filter(cls =>
-    cls.toUpperCase().includes(filter.toUpperCase())
-  );
+  const filtered = filter
+    ? classes.filter(cls => cls.toUpperCase().includes(filter.toUpperCase()))
+    : classes; // Show all if filter is empty
 
   filtered.forEach(cls => {
     const li = document.createElement("li");
