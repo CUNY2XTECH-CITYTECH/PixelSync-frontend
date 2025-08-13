@@ -5,22 +5,28 @@
     <link rel="stylesheet" href="/css/whiteboard.css" />
   </head>
   <body>
-    <!-- Sidebar wrapper to allow toggle from outside -->
+    <!-- Sidebar -->
     <div id="sidebarWrapper">
       <div class="sidebar" id="sidebar">
         <div id="drawTools">
           <label for="drawColorPicker">Draw Color:</label>
           <input type="color" id="drawColorPicker" value="#000000" />
           <label for="drawStrokeSize">Brush Size:</label>
-          <input type="range" id="drawStrokeSize" min="1" max="10" value="2" />
+          <input type="range" id="drawStrokeSize" min="1" max="50" value="10" />
         </div>
 
         <!-- Write Tools -->
-        <div id="writeTools" style="display:none">
+        <div id="writeTools" style="display: none">
           <label for="textColorPicker">Text Color:</label>
           <input type="color" id="textColorPicker" value="#000000" />
           <label for="fontSizeInput">Font Size:</label>
-          <input type="number" id="fontSizeInput" min="10" max="100" value="50" />
+          <input
+            type="number"
+            id="fontSizeInput"
+            min="10"
+            max="100"
+            value="32"
+          />
           <label for="fontPicker">Font:</label>
           <select id="fontPicker">
             <option value="Arial">Arial</option>
@@ -40,7 +46,21 @@
       </div>
     </div>
 
-    <canvas id="whiteboard" tabindex="0"></canvas>
+    <!-- Main drawing canvas -->
+    <canvas id="drawingCanvas" tabindex="0"></canvas>
+
+    <!-- Writing window, outside sidebar -->
+    <div id="writingWindow">
+      <div id="writingHeader" style="background:#ddd; padding:5px; cursor:move;">
+        ✏️ Writing Window
+      </div>
+      <canvas
+        id="writingCanvas"
+        width="400"
+        height="200"
+        style="display: block"
+      ></canvas>
+    </div>
 
     <script src="/js/whiteboard.js"></script>
   </body>
