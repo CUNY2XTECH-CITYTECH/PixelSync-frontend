@@ -1,12 +1,14 @@
 <div class="board-grid">
   <% if (boards && boards.length) { %>
     <% boards.forEach(function(board) { %>
-      <div class="board-tile">
-        <div><%= board.boardName %></div>
-        <% if (board.image) { %>
-          <img src="<%= board.image %>" alt="Board Image" style="width:100%;max-width:200px;" />
-        <% } %>
-      </div>
+      <a href="/whiteboard?name=<%= encodeURIComponent(board.boardName) %>&class=<%= encodeURIComponent(board.classCode) %>&tags=<%= encodeURIComponent(board.tags) %>" style="text-decoration:none;color:inherit;">
+        <div class="board-tile">
+          <div><%= board.boardName %></div>
+          <% if (board.image) { %>
+            <img src="<%= board.image %>" alt="Board Image" style="width:100%;max-width:200px;" />
+          <% } %>
+        </div>
+      </a>
     <% }) %>
   <% } else { %>
     <div>No boards yet. Create one!</div>

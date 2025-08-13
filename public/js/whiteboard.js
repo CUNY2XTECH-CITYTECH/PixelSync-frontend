@@ -246,6 +246,38 @@ window.addEventListener("load", () => {
     drawingCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
   });
 
+  // Redirect to dashboard after saving
+  const classCode = urlParams.get("class") || "";
+  const tags = urlParams.get("tags") || "";
+  window.location.href = `/whiteboard?name=${encodeURIComponent(boardName)}&class=${encodeURIComponent(classCode)}&tags=${encodeURIComponent(tags)}`;
+});
+
+function clearCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  writtenLines = [];
+  writingPosition = { x: 50, y: 50 };
+}
+
+document.addEventListener("keydown", (e) => {
+  if (mode !== "write") return;
+
+  ctx.font = `${textSize}px ${textFont}`;
+  ctx.fillStyle = textColor;
+
+  if (e.key === "Enter") {
+    writingPosition.y += lineHeight;
+    writingPosition.x = 50; // Reset x to left margin after line break
+  } else if (e.key === "Backspace") {
+    // Basic backspace: remove last character and redraw
+    if (writtenLines.length > 0) {
+      let lastLine = writtenLines[writtenLines.length - 1];
+      lastLine = lastLine.slice(0, -1);
+      writtenLines[writtenLines.length - 1] = lastLine;
+
+      if (lastLine.length === 0) {
+        writtenLines.pop();
+        writingPosition.y -= lineHeight;
+      }
   drawingCanvas.addEventListener("mousemove", (e) => {
     if (!isDrawing || mode !== "draw") return;
     const rect = drawingCanvas.getBoundingClientRect();
@@ -443,6 +475,23 @@ window.addEventListener("load", () => {
   }
 
 
+window.addEventListener("DOMContentLoaded", async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  let boardName = urlParams.get("name") || "whiteboard";
+  boardName = boardName.replace(/[^a-zA-Z0-9-_ ]/g, "_");
+
+  // Fetch the saved image from backend
+  const response = await fetch(`/dashboard/get-board-image?name=${encodeURIComponent(boardName)}`);
+  const data = await response.json();
+  if (data.image) {
+    const img = new window.Image();
+    img.onload = function () {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = data.image;
+  }
+});
   // Start caret when entering write mode, stop when leaving
   const originalSetMode = window.setMode;
   // we already exposed setMode; wrap it to manage caret
