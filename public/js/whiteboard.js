@@ -1,10 +1,13 @@
-/* whiteboard.js
-   Full integrated script: drawing canvas (background) + draggable/resizable writing window (foreground)
-   Paste entire file contents (replace current).
-*/
-
+// public/js/whiteboard.js
 window.addEventListener("load", () => {
-  // ---------- DOM elements ----------
+  // ---------- URL / Board ----------
+  const urlParams = new URLSearchParams(window.location.search);
+  const boardName = (urlParams.get("name") || "whiteboard").replace(
+    /[^a-zA-Z0-9-_ ]/g,
+    "_"
+  );
+
+  // ---------- DOM ----------
   const drawingCanvas = document.getElementById("drawingCanvas");
   const drawingCtx = drawingCanvas.getContext("2d");
 
@@ -12,254 +15,167 @@ window.addEventListener("load", () => {
   const writingCanvas = document.getElementById("writingCanvas");
   const writingCtx = writingCanvas.getContext("2d");
 
-  // Optional header inside writingWindow to drag from. If not present, the whole window is draggable.
-  const writingHeader =
-    document.getElementById("writingHeader") || writingWindow;
-
   const drawToolsEl = document.getElementById("drawTools");
   const writeToolsEl = document.getElementById("writeTools");
   const saveBtn = document.getElementById("saveBtn");
 
-  const fontSizeInput = document.getElementById("fontSizeInput");
+  const drawColorEl = document.getElementById("drawColorPicker");
+  const drawSizeEl = document.getElementById("drawStrokeSize");
 
-  fontSizeInput.addEventListener("keydown", (e) => {
-    const allowedKeys = [
-      "Backspace",
-      "Delete",
-      "ArrowLeft",
-      "ArrowRight",
-      "ArrowUp",
-      "ArrowDown",
-      "Tab",
-      "Home",
-      "End",
-      "Enter",
-    ];
+  const textColorEl = document.getElementById("textColorPicker");
+  const fontSizeEl = document.getElementById("fontSizeInput");
+  const fontPickerEl = document.getElementById("fontPicker");
 
-    // Allow control/navigation keys and digits only
-    if (!allowedKeys.includes(e.key) && (e.key < "0" || e.key > "9")) {
-      e.preventDefault();
-    }
-  });
-
-  fontSizeInput.addEventListener("input", (e) => {
-    const val = e.target.value.trim();
-
-    // Allow empty string so user can delete freely
-    if (val === "") {
-      // don't update font size yet
-      return;
-    }
-
-    const num = Number(val);
-
-    // Update only if valid number within range
-    if (!isNaN(num) && num >= 10 && num <= 100) {
-      textSize = num;
-
-      let cur = writingLines[writingLines.length - 1];
-      if (cur && cur.text === "") cur.size = textSize;
-
-      redrawWritingCanvas();
-    }
-  });
-
-  fontSizeInput.addEventListener("input", (e) => {
-    const val = e.target.value.trim();
-
-    // Allow empty string so user can delete freely
-    if (val === "") {
-      // Optionally: do not update textSize or redraw yet
-      return;
-    }
-
-    const num = Number(val);
-
-    // Only update if valid number and within limits
-    if (!isNaN(num) && num >= 10 && num <= 100) {
-      textSize = num;
-
-      // Update current line style if empty text
-      let cur = writingLines[writingLines.length - 1];
-      if (cur && cur.text === "") cur.size = textSize;
-
-      redrawWritingCanvas();
-    }
-  });
+  const writingHeader =
+    document.getElementById("writingHeader") || writingWindow;
 
   // ---------- State ----------
   let mode = "draw";
-  let drawing = false;
+  let isDrawing = false;
 
-  // Drawing settings
+  // Drawing
   let drawColor = "#000000";
   let drawSize = 10;
+  let drawingStrokes = []; // array of {x,y,color,size}
 
-  // Writing settings (defaults)
+  // Writing
   let textColor = "#000000";
   let textSize = 32;
   let textFont = "Arial";
-
-  // Each element is { text, color, size, font }
+  const writingPadding = 8;
   let writingLines = [
-    {
-      text: "",
-      color: textColor,
-      size: textSize,
-      font: textFont,
-    },
+    { text: "", color: textColor, size: textSize, font: textFont },
   ];
+  let caretVisible = true,
+    caretTimer = null;
 
-  const writingPadding = 8; // px inside writing canvas
-
-  // ---------- Canvas sizing ----------
+  // ---------- Sizing ----------
   function resizeDrawingCanvas() {
-    // keep full-window size
     drawingCanvas.width = window.innerWidth;
     drawingCanvas.height = window.innerHeight;
+    redrawAll();
+  }
+  function resizeWritingCanvas() {
+    const styles = getComputedStyle(writingWindow);
+    const width = Math.max(50, parseInt(styles.width, 10) || 400);
+    const height = Math.max(20, parseInt(styles.height, 10) || 200);
+    writingCanvas.width = width;
+    writingCanvas.height = height;
+    redrawWritingCanvas();
   }
   resizeDrawingCanvas();
   window.addEventListener("resize", resizeDrawingCanvas);
 
-  // Resize writing canvas to match container
-  function resizeWritingCanvas() {
-    if (!writingWindow) return;
-    const styles = getComputedStyle(writingWindow);
-    const width = Math.max(50, parseInt(styles.width, 10) || 400);
-    const height = Math.max(20, parseInt(styles.height, 10) || 200);
-
-    // set canvas backing size (resets content)
-    writingCanvas.width = width;
-    writingCanvas.height = height;
-
-    // redraw contents
-    redrawWritingCanvas();
-  }
-
-  // Use ResizeObserver to watch writingWindow size changes
-  let resizeObserver = null;
   if (typeof ResizeObserver !== "undefined" && writingWindow) {
-    resizeObserver = new ResizeObserver(resizeWritingCanvas);
-    resizeObserver.observe(writingWindow);
+    new ResizeObserver(resizeWritingCanvas).observe(writingWindow);
   } else {
-    // fallback: initial resize only
     resizeWritingCanvas();
   }
 
   // ---------- Helpers ----------
-  function safeGet(id) {
-    const el = document.getElementById(id);
-    if (!el) console.warn(`Element #${id} not found`);
-    return el;
+  function localXY(e, canvas) {
+    const r = canvas.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
   }
 
-  // ---------- Drawing control listeners ----------
-  const drawColorEl = safeGet("drawColorPicker");
-  const drawSizeEl = safeGet("drawStrokeSize");
+  function setMode(newMode) {
+    mode = newMode;
+    if (drawToolsEl)
+      drawToolsEl.style.display = mode === "draw" ? "block" : "none";
+    if (writeToolsEl)
+      writeToolsEl.style.display = mode === "write" ? "block" : "none";
+    if (writingWindow)
+      writingWindow.style.display = mode === "write" ? "block" : "none";
+    drawingCanvas.style.cursor = mode === "draw" ? "crosshair" : "default";
 
-  if (drawColorEl) {
-    drawColorEl.value = drawColor;
-    drawColorEl.addEventListener("input", (e) => {
-      drawColor = e.target.value;
-      console.log("drawColor ->", drawColor);
-    });
+    if (mode === "write") startCaret();
+    else stopCaret();
+    if (mode === "write") resizeWritingCanvas();
   }
-  if (drawSizeEl) {
-    drawSizeEl.value = drawSize;
-    drawSizeEl.addEventListener("input", (e) => {
-      drawSize = parseInt(e.target.value, 10) || drawSize;
-      console.log("drawSize ->", drawSize);
-    });
+  window.setMode = setMode;
+
+  function redrawAll() {
+    drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+    // replay drawing
+    if (drawingStrokes.length) {
+      drawingCtx.lineCap = "round";
+      for (let i = 0; i < drawingStrokes.length; i++) {
+        const p = drawingStrokes[i];
+        if (i === 0) {
+          drawingCtx.beginPath();
+          drawingCtx.moveTo(p.x, p.y);
+        } else {
+          const prev = drawingStrokes[i - 1];
+          drawingCtx.strokeStyle = p.color;
+          drawingCtx.lineWidth = p.size;
+          drawingCtx.lineTo(p.x, p.y);
+          drawingCtx.stroke();
+          // start a new path if the style changes abruptly or jump occurs
+          if (Math.abs(prev.x - p.x) + Math.abs(prev.y - p.y) > 200) {
+            drawingCtx.beginPath();
+            drawingCtx.moveTo(p.x, p.y);
+          }
+        }
+      }
+      drawingCtx.closePath();
+    }
+    redrawWritingCanvas();
   }
 
-  // ---------- Writing control listeners ----------
-  const textColorEl = safeGet("textColorPicker");
-  const fontSizeEl = safeGet("fontSizeInput");
-  const fontPickerEl = safeGet("fontPicker");
+  // ---------- Draw controls ----------
+  if (drawColorEl)
+    drawColorEl.addEventListener("input", (e) => (drawColor = e.target.value));
+  if (drawSizeEl)
+    drawSizeEl.addEventListener(
+      "input",
+      (e) => (drawSize = parseInt(e.target.value, 10) || drawSize)
+    );
 
-  if (textColorEl) {
-    textColorEl.value = textColor;
+  // ---------- Writing controls ----------
+  if (textColorEl)
     textColorEl.addEventListener("input", (e) => {
       textColor = e.target.value;
-      let cur = writingLines[writingLines.length - 1];
-      // Only update style if current line is empty (no typed text yet)
+      const cur = writingLines[writingLines.length - 1];
       if (cur && cur.text === "") cur.color = textColor;
       redrawWritingCanvas();
     });
-  }
-
-  if (fontSizeEl) {
-    fontSizeEl.value = textSize;
+  if (fontSizeEl)
     fontSizeEl.addEventListener("input", (e) => {
-      textSize = parseInt(e.target.value, 10) || textSize;
-      let cur = writingLines[writingLines.length - 1];
-      if (cur && cur.text === "") cur.size = textSize;
-      redrawWritingCanvas();
+      const n = parseInt(e.target.value, 10);
+      if (!isNaN(n) && n >= 10 && n <= 100) {
+        textSize = n;
+        const cur = writingLines[writingLines.length - 1];
+        if (cur && cur.text === "") cur.size = textSize;
+        redrawWritingCanvas();
+      }
     });
-  }
-
-  if (fontPickerEl) {
-    fontPickerEl.value = textFont;
+  if (fontPickerEl)
     fontPickerEl.addEventListener("change", (e) => {
       textFont = e.target.value;
-      let cur = writingLines[writingLines.length - 1];
+      const cur = writingLines[writingLines.length - 1];
       if (cur && cur.text === "") cur.font = textFont;
       redrawWritingCanvas();
     });
-  }
-
-
-
-  // ---------- Mode handling ----------
-  function setMode(newMode) {
-    mode = newMode;
-    console.log("Mode set to:", mode);
-
-    if (drawToolsEl) drawToolsEl.style.display = "none";
-    if (writeToolsEl) writeToolsEl.style.display = "none";
-    if (writingWindow) writingWindow.style.display = "none";
-
-    // stop any caret intervals if you had them (not included here)
-    // show only the relevant UI
-    if (mode === "draw") {
-      if (drawToolsEl) drawToolsEl.style.display = "block";
-      if (drawingCanvas) drawingCanvas.style.cursor = "crosshair";
-    } else if (mode === "write") {
-      if (writeToolsEl) writeToolsEl.style.display = "block";
-      if (writingWindow) writingWindow.style.display = "block";
-      if (drawingCanvas) drawingCanvas.style.cursor = "default";
-      resizeWritingCanvas(); // ensure writing canvas fits container
-    }
-  }
-
-  // expose globally so your HTML buttons can call setMode(...)
-  window.setMode = setMode;
 
   // ---------- Drawing handlers ----------
-  let isDrawing = false;
-
   drawingCanvas.addEventListener("mousedown", (e) => {
     if (mode !== "draw") return;
     isDrawing = true;
-    const rect = drawingCanvas.getBoundingClientRect();
+    const { x, y } = localXY(e, drawingCanvas);
     drawingCtx.beginPath();
-    drawingCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-  });
-
-  // Redirect to dashboard after saving
-  const classCode = urlParams.get("class") || "";
-  const tags = urlParams.get("tags") || "";
-  window.location.href = `/whiteboard?name=${encodeURIComponent(boardName)}&class=${encodeURIComponent(classCode)}&tags=${encodeURIComponent(tags)}`;
-});
-
-  drawingCanvas.addEventListener("mousemove", (e) => {
-    if (!isDrawing || mode !== "draw") return;
-    const rect = drawingCanvas.getBoundingClientRect();
-    drawingCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    drawingCtx.moveTo(x, y);
     drawingCtx.strokeStyle = drawColor;
     drawingCtx.lineWidth = drawSize;
     drawingCtx.lineCap = "round";
+    drawingStrokes.push({ x, y, color: drawColor, size: drawSize });
+  });
+
+  drawingCanvas.addEventListener("mousemove", (e) => {
+    if (!isDrawing || mode !== "draw") return;
+    const { x, y } = localXY(e, drawingCanvas);
+    drawingCtx.lineTo(x, y);
     drawingCtx.stroke();
+    drawingStrokes.push({ x, y, color: drawColor, size: drawSize });
   });
 
   window.addEventListener("mouseup", () => {
@@ -269,129 +185,37 @@ window.addEventListener("load", () => {
     }
   });
 
-  // ---------- Clear (drawing only) ----------
-  window.clearCanvas = function clearCanvas() {
-    const confirmClear = confirm(
-      "Are you sure you want to clear the drawing board?"
-    );
-    if (!confirmClear) return;
-    drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-  };
-
-  // ---------- Save merged image (drawing + writing) ----------
-  window.saveCanvas = function saveCanvas() {
-    // create temporary merge canvas
-    const tmp = document.createElement("canvas");
-    tmp.width = drawingCanvas.width;
-    tmp.height = drawingCanvas.height;
-    const tctx = tmp.getContext("2d");
-
-    // draw background (drawing)
-    tctx.drawImage(drawingCanvas, 0, 0);
-
-    // compute writingWindow position relative to drawing canvas
-    if (writingWindow && writingCanvas) {
-      const wRect = writingWindow.getBoundingClientRect();
-      const dRect = drawingCanvas.getBoundingClientRect();
-      const sx = wRect.left - dRect.left;
-      const sy = wRect.top - dRect.top;
-
-      // scale factor if drawingCanvas CSS size differs from backing size
-      tctx.drawImage(
-        writingCanvas,
-        sx,
-        sy,
-        writingCanvas.width,
-        writingCanvas.height
-      );
-    }
-
-    const link = document.createElement("a");
-    link.download = "whiteboard.png";
-    link.href = tmp.toDataURL();
-    link.click();
-  };
-
-  if (saveBtn) {
-    saveBtn.addEventListener("click", () => {
-      saveCanvas();
-    });
-  }
-
-  // ---------- Writing handlers ----------
-  // current caret blink handling (optional)
-  let caretVisible = true;
-  let caretTimer = null;
-  function startCaret() {
-    if (caretTimer) clearInterval(caretTimer);
-    caretVisible = true;
-    caretTimer = setInterval(() => {
-      caretVisible = !caretVisible;
-      redrawWritingCanvas();
-    }, 500);
-  }
-  function stopCaret() {
-    if (caretTimer) clearInterval(caretTimer);
-    caretTimer = null;
-    caretVisible = false;
-    redrawWritingCanvas();
-  }
-
+  // ---------- Writing: typing ----------
   window.addEventListener("keydown", (e) => {
     if (mode !== "write") return;
-
     const active = document.activeElement;
-    if (
-      active &&
-      (active.tagName === "INPUT" || active.tagName === "TEXTAREA")
-    ) {
+    if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA"))
       return;
-    }
 
-    // CTRL or CMD + A => select all text
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
       e.preventDefault();
-      // Select all text by marking a flag
       window.allTextSelected = true;
       redrawWritingCanvas();
       return;
     }
-
-    // If all text selected and backspace or delete pressed, clear all text
     if (
       window.allTextSelected &&
       (e.key === "Backspace" || e.key === "Delete")
     ) {
       e.preventDefault();
       writingLines = [
-        {
-          text: "",
-          color: textColor,
-          size: textSize,
-          font: textFont,
-        },
+        { text: "", color: textColor, size: textSize, font: textFont },
       ];
       window.allTextSelected = false;
       redrawWritingCanvas();
       return;
     }
-
-    // If any other key pressed, clear the selection flag
-    if (window.allTextSelected) {
-      window.allTextSelected = false;
-    }
-
-    // ... your existing text input handling below
-    // (Backspace, Enter, normal chars etc.)
+    if (window.allTextSelected) window.allTextSelected = false;
 
     const cur = writingLines[writingLines.length - 1];
-
     if (e.key === "Backspace") {
-      if (cur.text.length > 0) {
-        cur.text = cur.text.slice(0, -1);
-      } else if (writingLines.length > 1) {
-        writingLines.pop();
-      }
+      if (cur.text.length > 0) cur.text = cur.text.slice(0, -1);
+      else if (writingLines.length > 1) writingLines.pop();
       redrawWritingCanvas();
     } else if (e.key === "Enter") {
       writingLines.push({
@@ -407,37 +231,25 @@ window.addEventListener("load", () => {
     }
   });
 
-
   function redrawWritingCanvas() {
     writingCtx.clearRect(0, 0, writingCanvas.width, writingCanvas.height);
-
     let y = writingPadding;
-
     for (let line of writingLines) {
       writingCtx.font = `${line.size}px ${line.font}`;
-
       if (window.allTextSelected) {
-        // measure line width
         const w = writingCtx.measureText(line.text).width;
-
-        // draw highlight rectangle behind text
-        writingCtx.fillStyle = "rgba(0, 120, 215, 0.3)"; // blue highlight color
+        writingCtx.fillStyle = "rgba(0, 120, 215, 0.3)";
         writingCtx.fillRect(writingPadding - 2, y + 2, w + 4, line.size + 4);
       }
-
       writingCtx.fillStyle = line.color;
       writingCtx.fillText(line.text, writingPadding, y + line.size);
-
       y += Math.round(line.size * 1.2);
     }
-
-    // Draw caret only if not selecting all
     if (mode === "write" && caretVisible && !window.allTextSelected) {
       const last = writingLines[writingLines.length - 1];
       writingCtx.font = `${last.size}px ${last.font}`;
       const caretX = writingPadding + writingCtx.measureText(last.text).width;
-      const caretTop =
-        y - Math.round(last.size * 1.2) + (last.size - last.size);
+      const caretTop = y - Math.round(last.size * 1.2);
       const caretBottom = caretTop + last.size;
       writingCtx.beginPath();
       writingCtx.moveTo(caretX, caretTop);
@@ -448,70 +260,128 @@ window.addEventListener("load", () => {
     }
   }
 
-
-window.addEventListener("DOMContentLoaded", async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  let boardName = urlParams.get("name") || "whiteboard";
-  boardName = boardName.replace(/[^a-zA-Z0-9-_ ]/g, "_");
-
-  // Fetch the saved image from backend
-  const response = await fetch(`/dashboard/get-board-image?name=${encodeURIComponent(boardName)}`);
-  const data = await response.json();
-  if (data.image) {
-    const img = new window.Image();
-    img.onload = function () {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    };
-    img.src = data.image;
+  // caret
+  function startCaret() {
+    if (caretTimer) clearInterval(caretTimer);
+    caretVisible = true;
+    caretTimer = setInterval(() => {
+      caretVisible = !caretVisible;
+      redrawWritingCanvas();
+    }, 500);
   }
-});
-  // Start caret when entering write mode, stop when leaving
-  const originalSetMode = window.setMode;
-  // we already exposed setMode; wrap it to manage caret
-  window.setMode = function (newMode) {
-    originalSetMode(newMode); // call earlier function
-    if (newMode === "write") startCaret();
-    else stopCaret();
-  };
+  function stopCaret() {
+    if (caretTimer) clearInterval(caretTimer);
+    caretTimer = null;
+    caretVisible = false;
+    redrawWritingCanvas();
+  }
 
-  // ---------- Dragging (header only) ----------
-  let isDragging = false;
-  let dragOffsetX = 0;
-  let dragOffsetY = 0;
-
+  // ---------- Drag writing window ----------
+  let isDragging = false,
+    dragOffsetX = 0,
+    dragOffsetY = 0;
   writingHeader.addEventListener("mousedown", (e) => {
-    // only start drag on left mouse button
     if (e.button !== 0) return;
     isDragging = true;
     dragOffsetX = e.clientX - writingWindow.offsetLeft;
     dragOffsetY = e.clientY - writingWindow.offsetTop;
     e.preventDefault();
   });
-  window.addEventListener("mouseup", () => {
-    isDragging = false;
-  });
+  window.addEventListener("mouseup", () => (isDragging = false));
   window.addEventListener("mousemove", (e) => {
     if (!isDragging) return;
     writingWindow.style.left = e.clientX - dragOffsetX + "px";
     writingWindow.style.top = e.clientY - dragOffsetY + "px";
   });
 
-  // ---------- Ensure initial UI state ----------
-  // show draw tools by default
-  setMode("draw");
+  // ---------- Save ----------
+  async function saveBoardData() {
+    // make a thumbnail for dashboard (optional)
+    const tmp = document.createElement("canvas");
+    tmp.width = drawingCanvas.width;
+    tmp.height = drawingCanvas.height;
+    const tctx = tmp.getContext("2d");
+    tctx.drawImage(drawingCanvas, 0, 0);
+    // drop the writing canvas at its on-screen position
+    const wRect = writingWindow.getBoundingClientRect();
+    const dRect = drawingCanvas.getBoundingClientRect();
+    const sx = wRect.left - dRect.left;
+    const sy = wRect.top - dRect.top;
+    tctx.drawImage(writingCanvas, sx, sy);
+    const imageData = tmp.toDataURL("image/png");
 
-  // initial resize of writing canvas
-  resizeWritingCanvas();
+    const writingWindowData = {
+      left: writingWindow.offsetLeft,
+      top: writingWindow.offsetTop,
+      width: writingCanvas.width,
+      height: writingCanvas.height,
+    };
 
-  // debug helper: print element presence
-  console.log({
-    drawingCanvas: !!drawingCanvas,
-    writingWindow: !!writingWindow,
-    writingCanvas: !!writingCanvas,
-    drawColorEl: !!drawColorEl,
-    drawSizeEl: !!drawSizeEl,
-    textColorEl: !!textColorEl,
-    fontSizeEl: !!fontSizeEl,
-    fontPickerEl: !!fontPickerEl,
-  });
+    await fetch("/dashboard/save-board", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: boardName,
+        image: imageData, // thumbnail for dashboard
+        drawing: drawingStrokes, // editable data
+        writing: writingLines, // editable data
+        writingWindow: writingWindowData,
+      }),
+    });
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener("click", async () => {
+      try {
+        await saveBoardData();
+        // go back to dashboard (so you can see it listed)
+        window.location.href = "/dashboard";
+      } catch (err) {
+        console.error("Save failed", err);
+        alert("Save failed. See console.");
+      }
+    });
+  }
+
+  // ---------- Load existing data ----------
+  async function loadBoardData() {
+    try {
+      const res = await fetch(
+        `/dashboard/get-board-data?name=${encodeURIComponent(boardName)}`
+      );
+      const data = await res.json();
+
+      // Drawing
+      if (Array.isArray(data.drawing)) drawingStrokes = data.drawing;
+
+      // Writing: ensure writingLines always exists
+      if (Array.isArray(data.writing) && data.writing.length > 0) {
+        writingLines = data.writing;
+      } else {
+        writingLines = [
+          { text: "", color: textColor, size: textSize, font: textFont },
+        ];
+      }
+
+      // Writing window: ensure default position if missing
+      if (data.writingWindow) {
+        if (typeof data.writingWindow.left === "number")
+          writingWindow.style.left = data.writingWindow.left + "px";
+        if (typeof data.writingWindow.top === "number")
+          writingWindow.style.top = data.writingWindow.top + "px";
+      } else {
+        writingWindow.style.left = "50px";
+        writingWindow.style.top = "50px";
+      }
+
+      redrawAll();
+    } catch (err) {
+      console.error("Load failed", err);
+    }
+  }
+
+  // ---------- Initialize ----------
+  setMode("draw"); // default mode
+  resizeWritingCanvas(); // size the writing canvas
+  loadBoardData(); // pull any saved data
+});
